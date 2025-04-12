@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Control - Minemits</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <h1 class="titulo-morado" id="panelTitle">Panel de Control</h1>
+    <p id="visitorCount" class="visitor-count">Visitantes en la página: 0</p>
+    <button onclick="logout()" class="boton-rojo">Cerrar Sesión</button>
+    <button onclick="descargarTickets()" class="boton-verde">Descargar Tickets</button>
+
+    <table id="ticketsTable" class="tickets-table">
+        <thead>
+            <tr>
+                <th>Usuario</th>
+                <th>Email</th>
+                <th>Motivo</th>
+                <th>Mensaje</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+
+    <section class="formulario-actualizaciones">
+        <h2>Añadir Actualización</h2>
+        <form id="updateForm">
+            <div class="form-group">
+                <label for="titulo">Título:</label>
+                <input type="text" id="titulo" name="titulo" placeholder="Título de la actualización" required>
+            </div>
+            <div class="form-group">
+                <label for="contenido">Contenido:</label>
+                <textarea id="contenido" name="contenido" placeholder="Descripción de la actualización" required></textarea>
+            </div>
+            <button type="submit" class="boton-morado">Añadir Actualización</button>
+        </form>
+    </section>
+
+    <section class="lista-actualizaciones">
+        <h2>Actualizaciones Recientes</h2>
+        <ul id="actualizacionesLista"></ul>
+    </section>
+
+    <script>
+        const isLoggedIn = sessionStorage.getItem('isLoggedIn');
+        if (!isLoggedIn) {
+            window.location.href = 'login.html';
+        }
+        function updateVisitorCount() {
+            const visitorCountElement = document.getElementById('visitorCount');
+            let visitorCount = parseInt(localStorage.getItem('visitorCount')) || 0;
+            visitorCount++; 
+            localStorage.setItem('visitorCount', visitorCount); 
+            visitorCountElement.textContent = `Visitantes en la página: ${visitorCount}`;
+        }
+
+        updateVisitorCount();
+        function fetchTickets() {
+            const tickets = JSON.parse(localStorage.getItem('tickets')) || [];
+            const ticketsTableBody = document.querySelector('#ticketsTable tbody');
+            ticketsTableBody.innerHTML = ''; 
+
+            tickets.forEach((ticket, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${ticket.username}</td>
+                    <td>${ticket.email}</td>
+                    <td>${ticket.motivo}</td>
+                    <td>${ticket.mensaje}</td>
+                    <td>${ticket.estado}</td>
+                    <td>
+                        <button onclick="updateTicket(${index}, 'En Proceso')" class="boton-amarillo">En Proceso</button>
+                        <button onclick="updateTicket(${index}, 'Resuelto')" class="boton-verde">Resuelto</button>
+                    </td>
+                `;
+                ticketsTableBody.appendChild(row);
+            });
+        }
+
+        function updateTicket(index, estado) {
+            const tickets = JSON.parse(localStorage.getItem('tickets')) || [];
+            tickets[index].estado = estado;
+            localStorage.setItem('tickets', JSON.stringify(tickets));
+            fetchTickets(); 
+        }
+
+        function descargarTickets() {
+            const tickets = JSON.parse(localStorage.getItem('tickets')) || [];
+            const blob = new Blob([JSON.stringify(tickets, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'tickets.json';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function logout() {
+            sessionStorage.removeItem('isLoggedIn'); 
+            window.location.href = 'login.html'; 
+        }
+
+        function cargarActualizaciones() {
+            const actualizaciones = JSON.parse(localStorage.getItem('actualizaciones')) || [];
+            const lista = document.getElementById('actualizacionesLista');
+            lista.innerHTML = ''; 
+            actualizaciones.forEach((actualizacion, index) => {
+                const li = document.createElement('li');
+                li.innerHTML = `
+                    <strong>${actualizacion.titulo}</strong>: ${actualizacion.contenido}
+                    <button onclick="eliminarActualizacion(${index})" class="boton-rojo">Eliminar</button>
+                `;
+                lista.appendChild(li);
+            });
+        }
+
+        document.getElementById('updateForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const titulo = document.getElementById('titulo').value;
+            const contenido = document.getElementById('contenido').value;
+
+            const actualizaciones = JSON.parse(localStorage.getItem('actualizaciones')) || [];
+            actualizaciones.unshift({ titulo, contenido }); 
+            localStorage.setItem('actualizaciones', JSON.stringify(actualizaciones));
+            document.getElementById('updateForm').reset();
+            cargarActualizaciones();
+        });
+
+        function eliminarActualizacion(index) {
+            const actualizaciones = JSON.parse(localStorage.getItem('actualizaciones')) || [];
+            actualizaciones.splice(index, 1); 
+            localStorage.setItem('actualizaciones', JSON.stringify(actualizaciones));
+            cargarActualizaciones(); 
+        }
+        fetchTickets();
+        cargarActualizaciones();
+    </script>
+</body>
+</html>

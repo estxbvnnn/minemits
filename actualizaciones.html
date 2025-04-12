@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Actualizaciones - Minemits</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <header>
+        <div class="contenido-encabezado">
+            <div class="logo-contenedor">
+                <div class="logo" aria-label="Logo Minemits"></div>
+                <span class="titulo-logo"></span>
+            </div>
+            <nav>
+                <a href="index.html" class="boton-morado">Inicio</a>
+                <a href="votar.html" class="boton-morado">Votar</a>
+                <a href="contacto.html" class="boton-morado">Contacto</a>
+            </nav>
+        </div>
+    </header>
+    <section class="actualizaciones">
+        <h1 class="titulo-morado">Actualizaciones & Novedades</h1>
+        <article class="novedad">
+            <h2 class="titulo-morado">1.0 (Survival Tropical)</h2>
+            <ul>
+                <li>Sistema de Rankup progresivo.</li>
+                <li>Piedras de protección para resguardar tus construcciones.</li>
+                <li>Más de 14 trabajos disponibles para diversificar tu experiencia.</li>
+                <li>Mundos de Recursos, End y Nether con reinicio cada 30 DÍAS, garantizando frescura y equilibrio. (El mundo habitable contará con PvP)</li>
+                <li>Sistema de subastas (<code>/ah</code>) para comerciar con otros jugadores.</li>
+                <li>Don Pepe, nuestro comerciante exclusivo, estará disponible para comprar tus objetos. (solo compra objetos, no vende nada)</li>
+                <li>Recompensas diarias, semanales y mensuales, además de un calendario de recompensas por horas jugadas.</li>
+                <li>Zonas de PvP, eventos especiales y mucho más por descubrir.</li>
+                <li>Koth diario, es momento de traer a tu clan y ganar unas excelentes recompensas.</li>
+                <li>Zona AFK, puedes dejar tu jugador AFK todo el día y obtener recompensas.</li>
+            </ul>
+        </article>
+        <div id="actualizacionesDinamicas"></div>
+    </section>
+    <footer>
+        <p>&copy; 2025 Minemits. Todos los derechos reservados.</p>
+    </footer>
+
+    <script>
+        function cargarActualizacionesDinamicas() {
+            const actualizaciones = JSON.parse(localStorage.getItem('actualizaciones')) || [];
+            const contenedor = document.getElementById('actualizacionesDinamicas');
+            contenedor.innerHTML = ''; 
+
+            actualizaciones.forEach((actualizacion) => {
+                const article = document.createElement('article');
+                article.classList.add('novedad');
+                article.innerHTML = `
+                    <h2 class="titulo-morado">${actualizacion.titulo}</h2>
+                    <p>${actualizacion.contenido}</p>
+                `;
+                contenedor.appendChild(article);
+            });
+        }
+
+        cargarActualizacionesDinamicas();
+    </script>
+</body>
+</html>
